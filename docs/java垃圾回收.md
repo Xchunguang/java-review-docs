@@ -88,7 +88,7 @@ Java的垃圾回收机制作为Java的一大特性，这个机制让java程序员们不那么关心内存管理，
     
     改进的复制算法，使用改进复制算法回收新生代。由于新生代一般存活周期比较短，所以不需要按照1：1进行空闲区与活动区的内存分配，转而使用一块大内存空间(Eden)和两块小内存空间(Survivor)。每次使用一块Eden和一块Survivor1，垃圾回收时，将Eden和Survivor1中的所有存活的对象都复制到Survivor2空间里，然后清空Eden和Survivor1，之后Eden和Survivor2变成活动区，Survivor1变成空闲区。此算法就是会存在Survivor2的内存不足以放下Eden和Survivor1中所有的存货对象，此时就会向老年代“借”内存，将剩余对象通过分配担保机制进入老年代。同样，在多次GC过程过后还仍然存活的对象，也会被推到老年代中，并跟随老年代使用的主要垃圾回收而清理和压缩空间。
       
-    ![复制算法改进](https://github.com/Xchunguang/java-review-docs/blob/master/docs/img/copy-tow.jpg)
+    ![复制算法改进](https://github.com/Xchunguang/java-review-docs/blob/master/docs/img/copy-two.jpg)
     
   - 标记整理法
   
