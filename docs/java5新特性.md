@@ -6,9 +6,11 @@
   java泛型方法和泛型类的使用可以是泛型方法声明指定一组相关方法，泛型类可以声明指定一组相关类。
   
   - 泛型方法
+  
     泛型方法在调用时可以接收不同类型的参数，根据传递给泛型方法的参数类型，编译器适当的处理每一个方法的调用。
     
     泛型方法的定义规则如下：
+    
     - 每一个泛型方法声明都有一个类型参数声明部分，该参数在方法的返回值前，使用尖角号包围，内部逗号隔开，也被称为类型变量，用来指定一个泛型类型名称的标识符：
     
           public static <T,K> void genericsMethod(T t,K k){...}
@@ -33,6 +35,7 @@
           //上面语句表示T的类型范围为BaseVO的父类
           
   - 泛型类
+  
     泛型类的声明和非泛型类的声明类似，只是在类的后面添加了参数声明。泛型类的类型参数也可以使用extends或super确定类型范围。  
     
           /**
@@ -108,6 +111,7 @@
           }
     
   - 类型通配符
+  
     类型通配符一般是使用`?`代替具体的类型参数，例如List<?>即包括了List<String>、List<Integer>等所有类型参数。
     
         public void genericsMethod(List<?> list){...}
@@ -117,6 +121,7 @@
         public void genericsMethod(List<? extends Person> list){...}
 
   - 类型参数名约定写法：
+  
     按照约定，类型参数名称命名规则为单个大写子母，常用的类型参数名称如下：
     
         E - 元素，主要由Java集合(Collections)框架使用。
@@ -129,6 +134,7 @@
         V - 类型，主要用于表示第四个通用类型参数。
   
   - 类型推断：
+  
     类型推断表示Java编辑器方法的调用及其声明自动检查和确认参数类型，例如：
     
         List<String> list = new ArrayList<>();
@@ -136,6 +142,7 @@
         List<String> list = new ArrayList<String>();
         
   - 泛型的限制：
+  
     - 泛型的类型参数不能使用原始类型：在上面已经介绍过了，不过可以使用封装类型
     - 泛型中类型参数不能声明实例：
     
@@ -184,6 +191,7 @@
           }
 
 - 增强for循环(Enhanced for Loop)
+
   Java5简化了for循环的操作：
   
        int[] arr = {1, 2, 3, 4, 5};
@@ -192,12 +200,14 @@
        } 
        
 - 自动拆装箱(Autoboxing/Unboxing)
+
   Java的八种基本类型都分别有一个包装类，当需要时，基本类型和其包装类之间就会自动转换，基本类型转为包装类称为装箱，包装类转换为基础类型称为拆箱。
   
       Integer integerValue = new Integer(1);
       int intValue = integerValue;
       
 - 枚举(Typesafe Enums)
+
   Java枚举一般代表一组常用的常量，且代表一类相同类型的常量值。
   
   同时Java枚举有线程安全、自由序列化、保证单例的特性，所以也可以作为单例模式的一种实现：
@@ -210,6 +220,7 @@
       }
 
 - 可变参数 (Varargs)
+
   可变参数是一个类似数组一样的参数，可用循环遍历，而且可变参数只能放在方法参数列表的最后一个。
   
       public static void varags(String... names){
@@ -223,6 +234,7 @@
       }
       
 - 静态导入（Static Import）
+
   通过import导入一些静态的方法和变量，可以不用每次使用都加`类型.静态方法`或`类名.静态变量`形式
       
       //单个导入
@@ -231,6 +243,7 @@
       import static java.lang.Math.*;
 
 - 注解（Annotations）
+
   Annotations是Java5提供的新功能，它可以将元数据与程序元素相关联。声明注解：
   
       <modifiers> @interface <annotation-type-name>  {
@@ -249,4 +262,5 @@
 
       }
 - Java并发包(java.util.concurrent)
+
   Java5新增的并发包，使得并发编程更加轻松简单。
