@@ -263,4 +263,248 @@
       }
 - Java并发包(java.util.concurrent)
 
-  Java5新增的并发包，使得并发编程更加轻松简单。
+  Java5新增的并发包，使得并发编程更加轻松简单。此处总结一些并发包中的常用类：
+  
+  - 阻塞队列：BlockingQueue
+  
+    BlockingQueue接口：该接口表示的是一个线程安全的插入和提取实例的队列。
+    
+    ![阻塞队列](https://github.com/Xchunguang/java-review-docs/blob/master/docs/img/BlockQueue.png)
+
+    - 用法：
+    
+      BlockingQueue通常用于一个线程生产对象，另一个线程消费对象的场景。
+      
+      ![阻塞队列](https://github.com/Xchunguang/java-review-docs/blob/master/docs/img/queue-oper.png)
+
+      该队列有容纳临界点，即有限制的，当该阻塞队列到达了临界点，负责插入对象的线程将进入阻塞状态，直到消费的线程将对象拿走。且如果一个消费线程尝试从一个空的卒社队列提取对象时，也会进入阻塞状态，直到生产线程将新的对象放入阻塞队列。
+      
+    - 对象的操作方法：
+      
+      BlockingQueue提供了4组不同的方法用于插入、删除和检查元素。每组方法对不同的结果的表现不同
+      
+|             | 抛出异常  |  特定返回值  | 阻塞   |  超时  |
+| --------    | :-----:   | :----:       |:----:  |:----:  |
+| 插入        | add(e)    |  offer(e)    |put(e)  |offer(e,time,unit)  |
+| 删除        | remove()  |  poll()      |take()  |poll(time,unit)   |
+| 检查        | element() |  peek()      |不支持  |不支持     |
+    
+      - 抛出异常：
+      
+        如果试图的操作无法立即执行，将抛出一个异常
+        
+      - 返回特定值：
+      
+        如果试图的操作无法立即执行，将返回一个特定值，通常为true/false
+        
+      - 阻塞：
+      
+        如果试图的操作无法立即执行，该方法将发生阻塞，直到能够执行
+        
+      - 超时：
+      
+        如果试图的操作无法立即执行则该方法将会阻塞，直到能够执行，但是有一个超时时间，阻塞时间不会超过超时时间，并会返回一个值表示操作是否成功true/false。
+  
+    - 注意
+    
+      无法向一个BlockingQueue中插入null，如果试图插入null，则阻塞队列会抛出一个异常NullPointerException。
+      
+      可以访问阻塞队列的所有元素，而不仅仅是开始和结束的元素。例如可以移除掉队列中的任一一个元素，但这种操作的效率很低，除非必须如此。
+      
+    - 实现类示例：
+    
+          class Producer implements Runnable {
+             private final BlockingQueue queue;
+             Producer(BlockingQueue q) { queue = q; }
+             public void run() {
+               try {
+                 while (true) { queue.put(produce()); }
+               } catch (InterruptedException ex) { ... handle ...}
+             }
+             Object produce() { ... }
+           }
+
+           class Consumer implements Runnable {
+             private final BlockingQueue queue;
+             Consumer(BlockingQueue q) { queue = q; }
+             public void run() {
+               try {
+                 while (true) { consume(queue.take()); }
+               } catch (InterruptedException ex) { ... handle ...}
+             }
+             void consume(Object x) { ... }
+           }
+
+           class Setup {
+             void main() {
+               BlockingQueue q = new SomeQueueImplementation();
+               Producer p = new Producer(q);
+               Consumer c1 = new Consumer(q);
+               Consumer c2 = new Consumer(q);
+               new Thread(p).start();
+               new Thread(c1).start();
+               new Thread(c2).start();
+             }
+           }
+
+  - 数组阻塞队列：ArrayBlockingQueue
+    
+    ArrayBlockingQueue是BlockingQueue的一种实现。该队列的内部是使用数组进行对象的存放，ArrayBlockingQueue是一个有界的阻塞队列，初始化时就要确定该队列的容量，并且初始化后无法更改容量。
+    
+    ArrayBlockingQueue是一个FIFO先进先出的队列。头部的元素是队列中最长时间的元素，尾部的元素是队列中最短时间的元素，ArrayBlockingQueue队列从尾部插入新元素，从头部检索提取元素。
+  
+        BlockingQueue<String> queue = new ArrayBlockingQueue<String>(1024);  
+        queue.put("InserDemoStr");  
+        String string = queue.take();  
+        
+  - 延迟队列：DelayQueue
+  
+    延迟队列也是阻塞队列的一种实现类，该队列对元素的持有直到一个特定的延迟时期，延迟队列要求注入的元素必须实现java.util.concurrent.Delayed接口：
+    
+        public interface Delayed extends Comparable<Delayed> {  
+
+         public long getDelay(TimeUnit timeUnit);  
+
+        }  
+        
+    其中延迟队列会根据每个元素的getDelay()方法的返回值的时间段后就会释放该元素。
+    
+  - 链阻塞队列：LinkedBlockingQueue
+  
+    链式阻塞队列内部是使用链表实现的阻塞队列，该队列可选是否定义上限。链式阻塞队列也是一种先进先出队列。
+    
+  - 优先级阻塞队列：PriorityBlockingQueue
+  
+    优先级阻塞队列是一个无界的并发队列，它使用了和类 java.util.PriorityQueue 一样的排序规则。你无法向这个队列中插入 null 值。
+    
+    该队列所有插入的元素必须实现java.lang.Comparable接口，该队列中的元素排列是取决于插入元素对Comparable接口的实现。
+    
+  - 同步队列：SynchronousQueue
+  
+    同步队列是个特殊的队列，该队列内部只能同时容纳单个元素，如果该队列中包含了一个元素，那么所有插入队列的线程都会阻塞。
+    
+  - 阻塞双队列：BlockingDeque
+  
+    双端队列是一个可以从任意一端插入或提取元素的队列。
+    
+    ![双端队列](https://github.com/Xchunguang/java-review-docs/blob/master/docs/img/BlockDueue.png)
+
+    在线程的使用中，该线程即是生产者又是消费者可以使用阻塞双端队列，即生产者可以从队列的两端都可以插入数据，也可以从队列的两段提取数据。
+    
+    - 对象的操作方法：
+      
+      BlockingDueue也提供了4组不同的方法用于插入、删除和检查元素。每组方法对不同的结果的表现不同
+      
+| 头          | 抛出异常       |  特定返回值       | 阻塞        |  超时  |
+| --------    | :-----:        | :----:            |:----:       |:----:  |
+| 插入        | addFirst(e)    |  offerFirst(e)    |putFirst(e)  |offerFirst(e,time,unit)  |
+| 删除        | removeFirst()  |  pollFirst()      |takeFirst()  |pollFirst(time,unit)   |
+| 检查        | getFirst()     |  peekFirst()      |不支持       |不支持     |
+
+| 尾          | 抛出异常      |  特定返回值      | 阻塞       |  超时  |
+| --------    | :-----:       | :----:           |:----:      |:----:  |
+| 插入        | addLast(e)    |  offerLast(e)    |putLast(e)  |offerLast(e,time,unit)  |
+| 删除        | removeLast()  |  pollLast()      |takeLast()  |pollLast(time,unit)   |
+| 检查        | getLast()     |  peekLast()      |不支持      |不支持     |
+    
+      - 抛出异常：
+      
+        如果试图的操作无法立即执行，将抛出一个异常
+        
+      - 返回特定值：
+      
+        如果试图的操作无法立即执行，将返回一个特定值，通常为true/false
+        
+      - 阻塞：
+      
+        如果试图的操作无法立即执行，该方法将发生阻塞，直到能够执行
+        
+      - 超时：
+      
+        如果试图的操作无法立即执行则该方法将会阻塞，直到能够执行，但是有一个超时时间，阻塞时间不会超过超时时间，并会返回一个值表示操作是否成功true/false。
+  
+  - 链式阻塞双端队列：LinkedBlockDuque
+  
+    链式阻塞双端队列内部是通过链表实现，在它为空的时候，一个试图从中抽取数据的线程将会阻塞，无论该线程是试图从哪一端抽取数据。
+    
+  - 并发Map：ConcurrentMap:
+  
+    并发Map表示并发处理的Map，并发Map除继承自Map的方法外还提供了一些原子方法。
+    
+    ![并发Map](https://github.com/Xchunguang/java-review-docs/blob/master/docs/img/ConcurrentMap.png)
+
+    - ConcurrentHashMap:
+    
+      concurrentHashMap就是并发的HashMap，在写入和读取ConcurrentHashMap时，并不会将整个Map都锁住，而是锁住写入的部分。
+
+  - 闭锁：CountDownLatch:
+  
+    java.util.concurrent.CountDownLatch类似是一种计数器类型的功能，它定义了一个初始大小，使用await()方法开始计数，然后通过countDown()方法进行计数操作，当计数完成时将执行await()后面的方法。
+    
+        简单用法：
+        class Driver { // ...
+         void main() throws InterruptedException {
+           CountDownLatch startSignal = new CountDownLatch(1);
+           CountDownLatch doneSignal = new CountDownLatch(N);
+
+           for (int i = 0; i < N; ++i) // create and start threads
+             new Thread(new Worker(startSignal, doneSignal)).start();
+
+           doSomethingElse();            // don't let run yet
+           startSignal.countDown();      // let all threads proceed
+           doSomethingElse();
+           doneSignal.await();           // wait for all to finish
+         }
+       }
+
+       class Worker implements Runnable {
+         private final CountDownLatch startSignal;
+         private final CountDownLatch doneSignal;
+         Worker(CountDownLatch startSignal, CountDownLatch doneSignal) {
+            this.startSignal = startSignal;
+            this.doneSignal = doneSignal;
+         }
+         public void run() {
+            try {
+              startSignal.await();
+              doWork();
+              doneSignal.countDown();
+            } catch (InterruptedException ex) {} // return;
+         }
+
+         void doWork() { ... }
+       }
+
+  - 回环栅栏 CyclicBarrier：
+  
+    它可以实现让一组线程等待至某个状态之后再全部同时执行。叫做回环是因为当所有等待线程都被释放以后，CyclicBarrier可以被重用。
+    
+        public class CyclicBarrierTest {
+          public static void main(String[] args) {
+              int N = 4;
+              CyclicBarrier barrier  = new CyclicBarrier(N);
+              for(int i=0;i<N;i++)
+                  new Writer(barrier).start();
+          }
+          static class Writer extends Thread{
+              private CyclicBarrier cyclicBarrier;
+              public Writer(CyclicBarrier cyclicBarrier) {
+                  this.cyclicBarrier = cyclicBarrier;
+              }
+       
+              @Override
+              public void run() {
+                  System.out.println("线程"+Thread.currentThread().getName()+"正在写入数据");
+                  try {
+                      Thread.sleep(5000);      
+                      System.out.println("线程"+Thread.currentThread().getName()+"写入数据完毕，等待其他线程写入完毕");
+                      cyclicBarrier.await();
+                  } catch (InterruptedException e) {
+                      e.printStackTrace();
+                  }catch(BrokenBarrierException e){
+                      e.printStackTrace();
+                  }
+                  System.out.println("所有线程写入完毕");
+              }
+          }
+      }
