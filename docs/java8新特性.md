@@ -511,5 +511,5 @@ Base64类同时还提供了对URL、MIME友好的编码器与解码器（Base64.getUrlEncoder() / Ba
 		
 参考：<a href="https://www.javacodegeeks.com/2014/05/java-8-features-tutorial.html">Java 8 Features Tutorial </a>
 github：<a href="https://github.com/Xchunguang/java8">示例</a>
-
+官方文档：<a href="https://www.oracle.com/technetwork/java/javase/8-whats-new-2157071.html">JDK 8中的新功能</a>
 	
